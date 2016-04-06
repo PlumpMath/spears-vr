@@ -10,11 +10,11 @@
     "react-dom": "^0.14.3"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "webpack && cp src/index.html build/index.html",
     "preghpages": "npm run build && rm -rf gh-pages && cp -r src gh-pages && cp index.html build/bundle.js gh-pages",
     "ghpages": "npm run preghpages && ghpages -p gh-pages",
     "gh-pages": "npm run ghpages",
-    "serve": "cd src && python -m SimpleHTTPServer 5555",
+    "serve": "cd build && python -m SimpleHTTPServer 5555",
     "serve-js": "webpack-dev-server --content-base src --progress --watch --history-api-fallback --inline --hot"
   },
   "repository": {
@@ -37,6 +37,7 @@
   },
   "homepage": "https://github.com/ngokevin/aframe-react-boilerplate#readme",
   "devDependencies": {
+    "aframe-physics-components": "^1.1.0",
     "babel": "^6.3.13",
     "babel-core": "^6.3.15",
     "babel-loader": "^6.2.0",
