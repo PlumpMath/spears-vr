@@ -34,6 +34,9 @@ module.exports = {
     path: './build',
     publicPath: '/',
   },
+  externals: {
+    'three': 'THREE'
+  },
   module: {
     loaders: [
       {
