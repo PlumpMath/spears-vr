@@ -12,6 +12,9 @@ import Camera from './components/Camera';
 import Cursor from './components/Cursor';
 import Sky from './components/Sky';
 
+function degToRad(degrees) { return (degrees / 180) * Math.PI }
+function scaleVector(v, scale) { return {x: v.x * scale, y: v.y * scale, z: v.z * scale }; }
+
 
 aframe.registerSystem('state-system', {
   init: function() {
@@ -55,17 +58,8 @@ class BoilerplateScene extends React.Component {
     };
   }
 
-  spawnBox(rotation) {
+  spawnBox(position) {
     // -1 to 1
-    const position = {
-      // x: (((rotation.x % 360) - 180) / 360) * 3,
-      x: 0,
-      z: 0,
-      // z: (((rotation.z % 360) - 180) / 360) * 10,
-      // y: (((rotation.y % 360) - 180) / 360) * 10,
-      y: 0,
-    };
-    console.log(rotation.x * 360);
     this.setState({
       boxes: this.state.boxes.concat(position)
     });
@@ -90,12 +84,36 @@ class BoilerplateScene extends React.Component {
       );
     });
 
+    const { cameraDirection } = this.state;
+
+    let pointerBox;
+    if (cameraDirection) {
+      const position = scaleVector(cameraDirection, 4);
+
+      pointerBox = (
+        <Entity
+          physics-body="boundingBox: 1 1 1; mass: 100; velocity: 0 5 0"
+          geometry="primitive: box"
+          position={[position.x, position.y, position.z]}
+          material={{color: 'red'}}>
+        </Entity>
+      );
+    }
+
     return (
       <Scene physics-world="gravity: 0 -9.8 0">
         <a-assets>
         </a-assets>
         <Camera onRotate={(rotation) => {
-            this.spawnBox(rotation);
+            this.setState({
+              cameraDirection: {
+                x: -1 * Math.sin(degToRad(rotation.y % 360)),
+                y: Math.tan(degToRad(rotation.x)),
+                z: -1 * Math.cos(degToRad(rotation.y % 360)),
+              }
+            });
+
+            this.spawnBox(scaleVector(this.state.cameraDirection, 4));
           }}>
           <Cursor/>
         </Camera>
@@ -107,6 +125,7 @@ class BoilerplateScene extends React.Component {
         <Entity light={{type: 'directional', intensity: 1}} position={[1, 1, 0]}/>
 
         {droppedBoxes}
+        {pointerBox}
 
         <Entity
           id="ground"
