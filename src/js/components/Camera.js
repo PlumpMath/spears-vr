@@ -4,14 +4,31 @@ import React from 'react';
 
 aframe.registerComponent('lookDirection', {
   init() {
-    this.lastRotate = new Date();
+    this.lastRotation = null
   },
   tick() {
     const rotation = this.el.getAttribute('rotation');
-    if ((new Date() - this.lastRotate) >= 1000) {
+
+    if (rotation != this.lastRotation) {
       this.el.emit('rotate', rotation);
-      this.lastRotate = new Date();
     }
+
+    this.lastRotation = rotation;
+  }
+});
+
+aframe.registerComponent('movePosition', {
+  init() {
+    this.lastPosition = null;
+  },
+  tick() {
+    const position = this.el.getAttribute('position');
+
+    if (position != this.lastPosition) {
+      this.el.emit('move', position);
+    }
+
+    this.lastPosition = position;
   }
 });
 
@@ -23,13 +40,14 @@ const Camera = React.createClass({
     el.addEventListener('rotate', (e) => {
       this.props.onRotate(e.detail);
     });
+    el.addEventListener('move', (e) => {
+      this.props.onMove(e.detail);
+    });
   },
 
   render() {
     return (
-      <Entity>
-        <Entity onLoaded={this.onLoaded} lookDirection camera="" look-controls="" wasd-controls="" {...this.props}/>
-      </Entity>
+      <Entity onLoaded={this.onLoaded} lookDirection movePosition camera="" look-controls="" wasd-controls="" {...this.props}/>
     );
   }
 });
